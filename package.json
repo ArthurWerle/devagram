@@ -10,6 +10,7 @@
   "author": "Arthur Werle",
   "license": "ISC",
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.106",
     "serverless-plugin-typescript": "^2.1.2",
     "typescript": "^4.8.3"
   }
