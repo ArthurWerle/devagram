@@ -3,13 +3,16 @@ import { emailRegex, passwordRegex } from '../constants/Regexes'
 import { CognitoServices } from '../services/CognitoService'
 import { ConfirmEmailRequest } from '../types/auth/ConfirmEmailRequest'
 import { UserRegisterRequest } from '../types/auth/UserRegisterRequest'
+import { UserModel } from '../models/UserModel'
+import { User } from '../types/models/User'
 import { DefaultJsonResponse, formatResponse } from '../utils/formatResponse'
 
 export const register: Handler = async(event: APIGatewayEvent): Promise<DefaultJsonResponse> => {
   try {
-    const { USER_POOL_ID, USER_POOL_CLIENT_ID } = process.env
+    const { USER_POOL_ID, USER_POOL_CLIENT_ID, USER_TABLE } = process.env
 
     if (!USER_POOL_ID || !USER_POOL_CLIENT_ID) return formatResponse(500, 'Cognito ENV variables not found.')
+    if (!USER_TABLE) return formatResponse(500, 'DynamoDB ENV variable not found.')
 
     if (!event.body) return formatResponse(400, 'Missing request body.')
 
@@ -20,8 +23,14 @@ export const register: Handler = async(event: APIGatewayEvent): Promise<DefaultJ
     if (!password || !password.match(passwordRegex)) return formatResponse(400, 'Invalid password.')
     if (!name || name.trim().length < 2) return formatResponse(400, 'Invalid name.')
 
-    await new CognitoServices(USER_POOL_ID, USER_POOL_CLIENT_ID).signUp(email, password)
+    const cognitoUser = await new CognitoServices(USER_POOL_ID, USER_POOL_CLIENT_ID).signUp(email, password)
+    const user = {
+      name,
+      email,
+      cognitoId: cognitoUser.userSub
+    } as User
 
+    await UserModel.create(user)
     return formatResponse(200, 'User created.')
 
   } catch(error) {
