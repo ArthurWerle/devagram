@@ -6,6 +6,7 @@ import { UserRegisterRequest } from '../types/auth/UserRegisterRequest'
 import { UserModel } from '../models/UserModel'
 import { User } from '../types/models/User'
 import { DefaultJsonResponse, formatResponse } from '../utils/formatResponse'
+import { parse } from 'aws-multipart-parser'
 
 export const register: Handler = async(event: APIGatewayEvent): Promise<DefaultJsonResponse> => {
   try {
@@ -16,21 +17,22 @@ export const register: Handler = async(event: APIGatewayEvent): Promise<DefaultJ
 
     if (!event.body) return formatResponse(400, 'Missing request body.')
 
-    const request = JSON.parse(event.body) as UserRegisterRequest
-    const { name, password, email } = request
+    const formData = parse(event, true)
+    console.log('formdata:', formData)
 
-    if (!email || !email.match(emailRegex)) return formatResponse(400, 'Invalid email.')
-    if (!password || !password.match(passwordRegex)) return formatResponse(400, 'Invalid password.')
-    if (!name || name.trim().length < 2) return formatResponse(400, 'Invalid name.')
 
-    const cognitoUser = await new CognitoServices(USER_POOL_ID, USER_POOL_CLIENT_ID).signUp(email, password)
-    const user = {
-      name,
-      email,
-      cognitoId: cognitoUser.userSub
-    } as User
+    // if (!email || !email.match(emailRegex)) return formatResponse(400, 'Invalid email.')
+    // if (!password || !password.match(passwordRegex)) return formatResponse(400, 'Invalid password.')
+    // if (!name || name.trim().length < 2) return formatResponse(400, 'Invalid name.')
 
-    await UserModel.create(user)
+    // const cognitoUser = await new CognitoServices(USER_POOL_ID, USER_POOL_CLIENT_ID).signUp(email, password)
+    // const user = {
+    //   name,
+    //   email,
+    //   cognitoId: cognitoUser.userSub
+    // } as User
+
+    // await UserModel.create(user)
     return formatResponse(200, 'User created.')
 
   } catch(error) {
