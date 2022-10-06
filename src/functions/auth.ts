@@ -1,38 +1,50 @@
 import type { Handler, APIGatewayEvent } from 'aws-lambda'
-import { emailRegex, passwordRegex } from '../constants/Regexes'
+import { allowedImageExtensions, emailRegex, passwordRegex } from '../constants/Regexes'
 import { CognitoServices } from '../services/CognitoService'
+import { FormData } from '../types/auth/FormData'
 import { ConfirmEmailRequest } from '../types/auth/ConfirmEmailRequest'
 import { UserRegisterRequest } from '../types/auth/UserRegisterRequest'
 import { UserModel } from '../models/UserModel'
 import { User } from '../types/models/User'
 import { DefaultJsonResponse, formatResponse } from '../utils/formatResponse'
 import { parse } from 'aws-multipart-parser'
+import { S3Service } from '../services/S3Services'
 
 export const register: Handler = async(event: APIGatewayEvent): Promise<DefaultJsonResponse> => {
   try {
-    const { USER_POOL_ID, USER_POOL_CLIENT_ID, USER_TABLE } = process.env
+    const { USER_POOL_ID, USER_POOL_CLIENT_ID, USER_TABLE, AVATAR_BUCKET } = process.env
 
-    if (!USER_POOL_ID || !USER_POOL_CLIENT_ID) return formatResponse(500, 'Cognito ENV variables not found.')
-    if (!USER_TABLE) return formatResponse(500, 'DynamoDB ENV variable not found.')
+    if(!USER_POOL_ID || !USER_POOL_CLIENT_ID) return formatResponse(500, 'Cognito ENV variables not found.')
+    if(!USER_TABLE) return formatResponse(500, 'DynamoDB ENV variable not found.')
+    if(!AVATAR_BUCKET) return formatResponse(500, 'ENV Bucket avatar variable not found.')
 
-    if (!event.body) return formatResponse(400, 'Missing request body.')
+    if(!event.body) return formatResponse(400, 'Missing request body.')
 
     const formData = parse(event, true)
-    console.log('formdata:', formData)
+    const { file, name, email, password } = formData as FormData
 
 
-    // if (!email || !email.match(emailRegex)) return formatResponse(400, 'Invalid email.')
-    // if (!password || !password.match(passwordRegex)) return formatResponse(400, 'Invalid password.')
-    // if (!name || name.trim().length < 2) return formatResponse(400, 'Invalid name.')
+    if(!email || !email.match(emailRegex)) return formatResponse(400, 'Invalid email.')
+    if(!password || !password.match(passwordRegex)) return formatResponse(400, 'Invalid password.')
+    if(!name || name.trim().length < 2) return formatResponse(400, 'Invalid name.')
+    if(file && !allowedImageExtensions.exec(file.filename)) return formatResponse(400, 'Invalid image extension.')
 
-    // const cognitoUser = await new CognitoServices(USER_POOL_ID, USER_POOL_CLIENT_ID).signUp(email, password)
-    // const user = {
-    //   name,
-    //   email,
-    //   cognitoId: cognitoUser.userSub
-    // } as User
+    const cognitoUser = await new CognitoServices(USER_POOL_ID, USER_POOL_CLIENT_ID).signUp(email, password)
 
-    // await UserModel.create(user)
+    let imageKey = undefined
+
+    if(file) {
+      imageKey = await new S3Service().saveImage(AVATAR_BUCKET, 'avatar', file)
+    }
+
+    const user = {
+      name,
+      email,
+      cognitoId: cognitoUser.userSub,
+      avatar: imageKey
+    } as User
+
+    await UserModel.create(user)
     return formatResponse(200, 'User created.')
 
   } catch(error) {
