@@ -9,6 +9,7 @@ import { User } from '../types/models/User'
 import { DefaultJsonResponse, formatResponse } from '../utils/formatResponse'
 import { parse } from 'aws-multipart-parser'
 import { S3Service } from '../services/S3Services'
+import { ChangePasswordRequest } from '../types/auth/ChangePasswordRequest'
 
 export const register: Handler = async(event: APIGatewayEvent): Promise<DefaultJsonResponse> => {
   try {
@@ -74,5 +75,53 @@ export const confirmEmail: Handler = async(event: APIGatewayEvent): Promise<Defa
   } catch(error) {
     console.log('Error confirming user:', error)
     return formatResponse(500, 'Error confirming user, please try again.')
+  }
+}
+
+export const forgotPassword: Handler = async(event: APIGatewayEvent): Promise<DefaultJsonResponse> => {
+  try {
+    const { USER_POOL_ID, USER_POOL_CLIENT_ID } = process.env
+
+    if (!USER_POOL_ID || !USER_POOL_CLIENT_ID) return formatResponse(500, 'Cognito ENV variables not found.')
+
+    if (!event.body) return formatResponse(400, 'Missing request body.')
+
+    const request = JSON.parse(event.body)
+    const { email } = request
+
+    if (!email || !email.match(emailRegex)) return formatResponse(400, 'Invalid email.')
+    
+    await new CognitoServices(USER_POOL_ID, USER_POOL_CLIENT_ID).forgotPassword(email)
+
+    return formatResponse(200, 'Forgot password request sent.') 
+
+  } catch(error) {
+    console.log('Error on forgot password:', error)
+    return formatResponse(500, 'Error sending forgot password code, please try again.')
+  }
+}
+
+export const changePassword: Handler = async(event: APIGatewayEvent): Promise<DefaultJsonResponse> => {
+  try {
+    const { USER_POOL_ID, USER_POOL_CLIENT_ID } = process.env
+
+    if (!USER_POOL_ID || !USER_POOL_CLIENT_ID) return formatResponse(500, 'Cognito ENV variables not found.')
+
+    if (!event.body) return formatResponse(400, 'Missing request body.')
+
+    const request = JSON.parse(event.body) as ChangePasswordRequest
+    const { email, verificationCode, password } = request
+
+    if (!email || !email.match(emailRegex)) return formatResponse(400, 'Invalid email.')
+    if(!password || !password.match(passwordRegex)) return formatResponse(400, 'Invalid password.')
+    if (!verificationCode || verificationCode.length !== 6) return formatResponse(400, 'Invalid verification code.')
+    
+    await new CognitoServices(USER_POOL_ID, USER_POOL_CLIENT_ID).changePassword(email, password, verificationCode)
+
+    return formatResponse(200, 'Password changed successfully.') 
+
+  } catch(error) {
+    console.log('Error on change password:', error)
+    return formatResponse(500, 'Error changing password, please try again.')
   }
 }
