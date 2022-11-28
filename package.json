@@ -1,7 +1,7 @@
 {
   "name": "devagram",
   "version": "1.0.0",
-  "description": "Estudo sobre o curso de arquitetura serverless - Replica do instagram",
+  "description": "Instagram copy using microservices architecture",
   "main": "handler.js",
   "private": "true",
   "scripts": {

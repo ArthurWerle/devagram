@@ -24,6 +24,8 @@ export const register: Handler = async(event: APIGatewayEvent): Promise<DefaultJ
     const formData = parse(event, true)
     const { file, name, email, password } = formData as FormData
 
+    console.log('formData data log:', formData)
+
     if(!email || !email.match(emailRegex)) return formatResponse(400, 'Invalid email.')
     if(!password || !password.match(passwordRegex)) return formatResponse(400, 'Invalid password.')
     if(!name || name.trim().length < 2) return formatResponse(400, 'Invalid name.')
