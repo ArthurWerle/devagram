@@ -9,14 +9,12 @@ import { DefaultJsonResponse, formatResponse } from '../utils/formatResponse'
 import { parse } from 'aws-multipart-parser'
 import { S3Service } from '../services/S3Services'
 import { ChangePasswordRequest } from '../types/auth/ChangePasswordRequest'
+import { validateEnvVariables } from '../utils/environment'
 
 export const register: Handler = async(event: APIGatewayEvent): Promise<DefaultJsonResponse> => {
   try {
-    const { USER_POOL_ID, USER_POOL_CLIENT_ID, USER_TABLE, AVATAR_BUCKET } = process.env
-
-    if(!USER_POOL_ID || !USER_POOL_CLIENT_ID) return formatResponse(500, 'Cognito ENV variables not found.')
-    if(!USER_TABLE) return formatResponse(500, 'DynamoDB ENV variable not found.')
-    if(!AVATAR_BUCKET) return formatResponse(500, 'ENV Bucket avatar variable not found.')
+    const { USER_POOL_ID = '', USER_POOL_CLIENT_ID = '', AVATAR_BUCKET = '', error } = validateEnvVariables(['USER_POOL_ID', 'USER_POOL_CLIENT_ID', 'USER_TABLE', 'AVATAR_BUCKET'])
+    if(error) return formatResponse(500, error)
 
     if(!event.body) return formatResponse(400, 'Missing request body.')
 
@@ -54,9 +52,8 @@ export const register: Handler = async(event: APIGatewayEvent): Promise<DefaultJ
 
 export const confirmEmail: Handler = async(event: APIGatewayEvent): Promise<DefaultJsonResponse> => {
   try {
-    const { USER_POOL_ID, USER_POOL_CLIENT_ID } = process.env
-
-    if (!USER_POOL_ID || !USER_POOL_CLIENT_ID) return formatResponse(500, 'Cognito ENV variables not found.')
+    const { USER_POOL_ID = '', USER_POOL_CLIENT_ID = '', error } = validateEnvVariables(['USER_POOL_ID', 'USER_POOL_CLIENT_ID'])
+    if(error) return formatResponse(500, error)
 
     if (!event.body) return formatResponse(400, 'Missing request body.')
 
@@ -78,9 +75,8 @@ export const confirmEmail: Handler = async(event: APIGatewayEvent): Promise<Defa
 
 export const forgotPassword: Handler = async(event: APIGatewayEvent): Promise<DefaultJsonResponse> => {
   try {
-    const { USER_POOL_ID, USER_POOL_CLIENT_ID } = process.env
-
-    if (!USER_POOL_ID || !USER_POOL_CLIENT_ID) return formatResponse(500, 'Cognito ENV variables not found.')
+    const { USER_POOL_ID = '', USER_POOL_CLIENT_ID = '', error } = validateEnvVariables(['USER_POOL_ID', 'USER_POOL_CLIENT_ID'])
+    if(error) return formatResponse(500, error)
 
     if (!event.body) return formatResponse(400, 'Missing request body.')
 
@@ -101,9 +97,8 @@ export const forgotPassword: Handler = async(event: APIGatewayEvent): Promise<De
 
 export const changePassword: Handler = async(event: APIGatewayEvent): Promise<DefaultJsonResponse> => {
   try {
-    const { USER_POOL_ID, USER_POOL_CLIENT_ID } = process.env
-
-    if (!USER_POOL_ID || !USER_POOL_CLIENT_ID) return formatResponse(500, 'Cognito ENV variables not found.')
+    const { USER_POOL_ID = '', USER_POOL_CLIENT_ID = '', error } = validateEnvVariables(['USER_POOL_ID', 'USER_POOL_CLIENT_ID'])
+    if(error) return formatResponse(500, error)
 
     if (!event.body) return formatResponse(400, 'Missing request body.')
 

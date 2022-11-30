@@ -6,12 +6,12 @@ import { S3Service } from "../services/S3Services"
 import { parse } from "aws-multipart-parser"
 import { FormData } from '../types/auth/FormData'
 import { allowedImageExtensions } from "../constants/Regexes"
+import { validateEnvVariables } from "../utils/environment"
 
 export const me: Handler = async(event: APIGatewayEvent): Promise<DefaultJsonResponse> => {
   try {
-    const { USER_TABLE, AVATAR_BUCKET } = process.env
-
-    if (!USER_TABLE || !AVATAR_BUCKET) return formatResponse(500, 'ENV variables not found.')
+    const { AVATAR_BUCKET = '', error } = validateEnvVariables(['USER_TABLE', 'AVATAR_BUCKET'])
+    if(error) return formatResponse(500, error)
 
     const userId = getUserIdFromEvent(event)
     if(!userId) return formatResponse(400, 'user not found.')
@@ -32,9 +32,8 @@ export const me: Handler = async(event: APIGatewayEvent): Promise<DefaultJsonRes
 
 export const update: Handler = async(event: APIGatewayEvent): Promise<DefaultJsonResponse> => {
   try {
-    const { USER_TABLE, AVATAR_BUCKET } = process.env
-
-    if (!USER_TABLE || !AVATAR_BUCKET) return formatResponse(500, 'ENV variables not found.')
+    const { AVATAR_BUCKET = '', error } = validateEnvVariables(['USER_TABLE', 'AVATAR_BUCKET'])
+    if(error) return formatResponse(500, error)
 
     const userId = getUserIdFromEvent(event)
     if(!userId) return formatResponse(400, 'user not found.')

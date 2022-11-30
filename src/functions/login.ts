@@ -1,13 +1,13 @@
 import { APIGatewayEvent, Handler } from "aws-lambda"
 import { CognitoServices } from "../services/CognitoService"
 import { LoginRequest } from "../types/login/LoginRequest"
+import { validateEnvVariables } from "../utils/environment"
 import { DefaultJsonResponse, formatResponse } from "../utils/formatResponse"
 
 export const handler: Handler = async(event: APIGatewayEvent): Promise<DefaultJsonResponse> => {
     try {
-      const { USER_POOL_ID, USER_POOL_CLIENT_ID } = process.env
-  
-      if (!USER_POOL_ID || !USER_POOL_CLIENT_ID) return formatResponse(500, 'Cognito ENV variables not found.')
+      const { USER_POOL_ID = '', USER_POOL_CLIENT_ID = '', error } = validateEnvVariables(['USER_POOL_ID', 'USER_POOL_CLIENT_ID'])
+      if(error) return formatResponse(500, error)
   
       if (!event.body) return formatResponse(400, 'Missing request body.')
   
