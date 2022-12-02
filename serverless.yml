@@ -102,6 +102,13 @@ functions:
           path: /user
           method: put
           authorizer: serviceAuthorizer
+  create-post:
+    handler: src/functions/post.create
+    events:
+      - httpApi:
+          path: /post
+          method: post
+          authorizer: serviceAuthorizer
 
 resources:
   Resources:

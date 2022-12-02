@@ -4,6 +4,8 @@ type Result = {
   USER_POOL_CLIENT_ID?: string
   USER_TABLE?: string
   AVATAR_BUCKET?: string
+  POST_TABLE?: string
+  POST_BUCKET?: string
 }
 
 export const validateEnvVariables = (envs: Array<string>): Result => {
