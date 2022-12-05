@@ -49,3 +49,33 @@ export const create: Handler = async(event: APIGatewayEvent): Promise<DefaultJso
     return formatResponse(500, 'Error on creating post, please try again.')
   }
 }
+
+export const toggleLike: Handler = async(event: any): Promise<DefaultJsonResponse> => {
+  try {
+    const { error } = validateEnvVariables(['POST_TABLE'])
+    if (error) return formatResponse(500, error)
+
+    const userId = getUserIdFromEvent(event)
+    if (!userId) return formatResponse(400, 'user not found.')
+
+    const user = await UserModel.get({ 'cognitoId': userId })
+    if (!user) return formatResponse(400, 'User not found.')
+
+    const { postId } = event.pathParameters
+    const post = await PostModel.get({ id: postId })
+    if (!post) {
+      return formatResponse(400, 'Post not found')
+    }
+
+    const hasLiked = post.likes.some(like => like.toString() === userId)
+    if (hasLiked) post.likes = post.likes.filter(like => like.toString() !== userId)
+    else post.likes.push(userId)
+
+    await PostModel.update(post)
+    return formatResponse(200, 'Post like/disliked with success!') 
+
+  } catch(error) {
+    console.log('Error on toggle like:', error)
+    return formatResponse(500, 'Error on like/dislike, please try again.')
+  }
+}
