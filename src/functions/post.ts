@@ -56,10 +56,10 @@ export const toggleLike: Handler = async(event: any): Promise<DefaultJsonRespons
     if (error) return formatResponse(500, error)
 
     const userId = getUserIdFromEvent(event)
-    if (!userId) return formatResponse(400, 'user not found.')
+    if (!userId) return formatResponse(400, 'User not found.')
 
     const user = await UserModel.get({ 'cognitoId': userId })
-    if (!user) return formatResponse(400, 'User not found.')
+    if (!user) return formatResponse(400, "User doesn`t exists.")
 
     const { postId } = event.pathParameters
     const post = await PostModel.get({ id: postId })
@@ -77,5 +77,43 @@ export const toggleLike: Handler = async(event: any): Promise<DefaultJsonRespons
   } catch(error) {
     console.log('Error on toggle like:', error)
     return formatResponse(500, 'Error on like/dislike, please try again.')
+  }
+}
+
+export const postComment: Handler = async(event: any): Promise<DefaultJsonResponse> => {
+  try {
+    const { error } = validateEnvVariables(['POST_TABLE'])
+    if (error) return formatResponse(500, error)
+
+    const userId = getUserIdFromEvent(event)
+    if (!userId) return formatResponse(400, 'User not found.')
+
+    const user = await UserModel.get({ 'cognitoId': userId })
+    if (!user) return formatResponse(400, "User doesn't exists.")
+
+    const { postId } = event.pathParameters
+    const post = await PostModel.get({ id: postId })
+    if (!post) {
+      return formatResponse(400, 'Post not found')
+    }
+
+    const request = JSON.parse(event.body)
+    const { commentContent } = request
+    if (!commentContent) return formatResponse(400, 'Comment not found.')
+
+    const comment = {
+      userId,
+      userName: user.name,
+      date: moment().format(),
+      content: commentContent
+    }
+
+    post.comments.push(comment)
+    await PostModel.update(post)
+    return formatResponse(200, 'Post commented with success!') 
+
+  } catch(error) {
+    console.log('Error on commenting post:', error)
+    return formatResponse(500, 'Error on comment post, please try again.')
   }
 }
