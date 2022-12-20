@@ -1,12 +1,12 @@
 import type { DefaultResponseMessage } from '../types/DefaultResponseMessage'
 
-export type DefaultJsonResponse = {
+export type DefaultResponse = {
   statusCode: number
   headers: {},
   body: string
 }
 
-export function formatResponse(statusCode: number, message: string | undefined, response?: Record<string, unknown>): DefaultJsonResponse {
+export function formatResponse(statusCode: number, message: string | undefined, response?: Record<string, unknown>): DefaultResponse {
   const result: DefaultResponseMessage = {}
 
   if (message && (statusCode >= 200 && statusCode <= 399)) result.message = message

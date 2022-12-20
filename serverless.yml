@@ -123,6 +123,13 @@ functions:
           path: /comment/{postId}
           method: put
           authorizer: serviceAuthorizer
+  get-post:
+    handler: src/functions/post.get
+    events:
+      - httpApi:
+          path: /post/{postId}
+          method: get
+          authorizer: serviceAuthorizer
 
 resources:
   Resources:

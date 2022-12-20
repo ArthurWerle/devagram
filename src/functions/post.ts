@@ -1,7 +1,7 @@
 import { APIGatewayEvent, Handler } from "aws-lambda"
 import {UserModel } from '../models/UserModel'
 import { getUserIdFromEvent } from "../utils/authenticationHandler"
-import { DefaultJsonResponse, formatResponse } from "../utils/formatResponse"
+import { DefaultResponse, formatResponse } from "../utils/formatResponse"
 import { S3Service } from "../services/S3Services"
 import { parse } from "aws-multipart-parser"
 import { FormData } from '../types/auth/FormData'
@@ -11,7 +11,7 @@ import * as uuid from 'uuid'
 import * as moment from 'moment'
 import { PostModel } from "../models/PostModel"
 
-export const create: Handler = async(event: APIGatewayEvent): Promise<DefaultJsonResponse> => {
+export const create: Handler = async(event: APIGatewayEvent): Promise<DefaultResponse> => {
   try {
     const { POST_BUCKET = '', error } = validateEnvVariables(['USER_TABLE', 'POST_TABLE', 'POST_BUCKET'])
     if(error) return formatResponse(500, error)
@@ -50,7 +50,7 @@ export const create: Handler = async(event: APIGatewayEvent): Promise<DefaultJso
   }
 }
 
-export const toggleLike: Handler = async(event: any): Promise<DefaultJsonResponse> => {
+export const toggleLike: Handler = async(event: any): Promise<DefaultResponse> => {
   try {
     const { error } = validateEnvVariables(['POST_TABLE'])
     if (error) return formatResponse(500, error)
@@ -80,7 +80,7 @@ export const toggleLike: Handler = async(event: any): Promise<DefaultJsonRespons
   }
 }
 
-export const postComment: Handler = async(event: any): Promise<DefaultJsonResponse> => {
+export const postComment: Handler = async(event: any): Promise<DefaultResponse> => {
   try {
     const { error } = validateEnvVariables(['POST_TABLE'])
     if (error) return formatResponse(500, error)
@@ -115,5 +115,31 @@ export const postComment: Handler = async(event: any): Promise<DefaultJsonRespon
   } catch(error) {
     console.log('Error on commenting post:', error)
     return formatResponse(500, 'Error on comment post, please try again.')
+  }
+}
+
+export const get: Handler = async(event: any): Promise<DefaultResponse> =>{
+  try {
+    const { error, POST_BUCKET = '' } = validateEnvVariables(['POST_BUCKET', 'POST_TABLE'])
+    if (error) return formatResponse(500, error)
+
+    const userId = getUserIdFromEvent(event)
+    if (!userId) return formatResponse(400, 'User not found')
+
+    const user = await UserModel.get({ cognitoId: userId })
+    if (!user) return formatResponse(400, 'User not found')
+
+    const { postId } = event.pathParameters
+    if (!postId) return formatResponse(400, 'Post not found')
+
+    const post = await PostModel.get({ id: postId })
+    if (!post) return formatResponse(400, 'Post not found')
+
+    post.image = await new S3Service().getImageUrl(POST_BUCKET, post.image)
+
+    return formatResponse(200, undefined, post)
+  } catch (error) {
+    console.log('Error on get post by id: ', error)
+    return formatResponse(500, 'Error on retrieving posts, try again later')
   }
 }

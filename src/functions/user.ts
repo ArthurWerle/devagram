@@ -1,14 +1,14 @@
 import { APIGatewayEvent, Handler } from "aws-lambda"
 import {UserModel } from './../models/UserModel'
 import { getUserIdFromEvent } from "../utils/authenticationHandler"
-import { DefaultJsonResponse, formatResponse } from "../utils/formatResponse"
+import { DefaultResponse, formatResponse } from "../utils/formatResponse"
 import { S3Service } from "../services/S3Services"
 import { parse } from "aws-multipart-parser"
 import { FormData } from '../types/auth/FormData'
 import { allowedImageExtensions } from "../constants/Regexes"
 import { validateEnvVariables } from "../utils/environment"
 
-export const me: Handler = async(event: APIGatewayEvent): Promise<DefaultJsonResponse> => {
+export const me: Handler = async(event: APIGatewayEvent): Promise<DefaultResponse> => {
   try {
     const { AVATAR_BUCKET = '', error } = validateEnvVariables(['USER_TABLE', 'AVATAR_BUCKET'])
     if(error) return formatResponse(500, error)
@@ -30,7 +30,7 @@ export const me: Handler = async(event: APIGatewayEvent): Promise<DefaultJsonRes
   }
 }
 
-export const update: Handler = async(event: APIGatewayEvent): Promise<DefaultJsonResponse> => {
+export const update: Handler = async(event: APIGatewayEvent): Promise<DefaultResponse> => {
   try {
     const { AVATAR_BUCKET = '', error } = validateEnvVariables(['USER_TABLE', 'AVATAR_BUCKET'])
     if(error) return formatResponse(500, error)

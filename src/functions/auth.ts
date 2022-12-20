@@ -5,13 +5,13 @@ import { FormData } from '../types/auth/FormData'
 import { ConfirmEmailRequest } from '../types/auth/ConfirmEmailRequest'
 import { UserModel } from '../models/UserModel'
 import { User } from '../types/models/User'
-import { DefaultJsonResponse, formatResponse } from '../utils/formatResponse'
+import { DefaultResponse, formatResponse } from '../utils/formatResponse'
 import { parse } from 'aws-multipart-parser'
 import { S3Service } from '../services/S3Services'
 import { ChangePasswordRequest } from '../types/auth/ChangePasswordRequest'
 import { validateEnvVariables } from '../utils/environment'
 
-export const register: Handler = async(event: APIGatewayEvent): Promise<DefaultJsonResponse> => {
+export const register: Handler = async(event: APIGatewayEvent): Promise<DefaultResponse> => {
   try {
     const { USER_POOL_ID = '', USER_POOL_CLIENT_ID = '', AVATAR_BUCKET = '', error } = validateEnvVariables(['USER_POOL_ID', 'USER_POOL_CLIENT_ID', 'USER_TABLE', 'AVATAR_BUCKET'])
     if(error) return formatResponse(500, error)
@@ -50,7 +50,7 @@ export const register: Handler = async(event: APIGatewayEvent): Promise<DefaultJ
   }
 }
 
-export const confirmEmail: Handler = async(event: APIGatewayEvent): Promise<DefaultJsonResponse> => {
+export const confirmEmail: Handler = async(event: APIGatewayEvent): Promise<DefaultResponse> => {
   try {
     const { USER_POOL_ID = '', USER_POOL_CLIENT_ID = '', error } = validateEnvVariables(['USER_POOL_ID', 'USER_POOL_CLIENT_ID'])
     if(error) return formatResponse(500, error)
@@ -73,7 +73,7 @@ export const confirmEmail: Handler = async(event: APIGatewayEvent): Promise<Defa
   }
 }
 
-export const forgotPassword: Handler = async(event: APIGatewayEvent): Promise<DefaultJsonResponse> => {
+export const forgotPassword: Handler = async(event: APIGatewayEvent): Promise<DefaultResponse> => {
   try {
     const { USER_POOL_ID = '', USER_POOL_CLIENT_ID = '', error } = validateEnvVariables(['USER_POOL_ID', 'USER_POOL_CLIENT_ID'])
     if(error) return formatResponse(500, error)
@@ -95,7 +95,7 @@ export const forgotPassword: Handler = async(event: APIGatewayEvent): Promise<De
   }
 }
 
-export const changePassword: Handler = async(event: APIGatewayEvent): Promise<DefaultJsonResponse> => {
+export const changePassword: Handler = async(event: APIGatewayEvent): Promise<DefaultResponse> => {
   try {
     const { USER_POOL_ID = '', USER_POOL_CLIENT_ID = '', error } = validateEnvVariables(['USER_POOL_ID', 'USER_POOL_CLIENT_ID'])
     if(error) return formatResponse(500, error)

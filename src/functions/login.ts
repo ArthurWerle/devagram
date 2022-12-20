@@ -2,9 +2,9 @@ import { APIGatewayEvent, Handler } from "aws-lambda"
 import { CognitoServices } from "../services/CognitoService"
 import { LoginRequest } from "../types/login/LoginRequest"
 import { validateEnvVariables } from "../utils/environment"
-import { DefaultJsonResponse, formatResponse } from "../utils/formatResponse"
+import { DefaultResponse, formatResponse } from "../utils/formatResponse"
 
-export const handler: Handler = async(event: APIGatewayEvent): Promise<DefaultJsonResponse> => {
+export const handler: Handler = async(event: APIGatewayEvent): Promise<DefaultResponse> => {
     try {
       const { USER_POOL_ID = '', USER_POOL_CLIENT_ID = '', error } = validateEnvVariables(['USER_POOL_ID', 'USER_POOL_CLIENT_ID'])
       if(error) return formatResponse(500, error)
