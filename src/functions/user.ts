@@ -61,3 +61,27 @@ export const update: Handler = async(event: APIGatewayEvent): Promise<DefaultRes
     return formatResponse(500, 'Error on updating user data, please try again.')
   }
 }
+
+export const getById: Handler = async(event: any): Promise<DefaultResponse> => {
+  try {
+    const { AVATAR_BUCKET = '', error } = validateEnvVariables(['USER_TABLE', 'AVATAR_BUCKET'])
+    if(error) return formatResponse(500, error)
+
+    const { userId } = event.pathParameters
+    if(!userId) return formatResponse(400, 'user not found.')
+
+    const user = await UserModel.get({ cognitoId: userId })
+    if(!user) return formatResponse(400, 'user not found.')
+
+    if(user.avatar) {
+      const url = await new S3Service().getImageUrl(AVATAR_BUCKET, user.avatar)
+      user.avatar = url
+    }
+
+    return formatResponse(200, undefined, user) 
+
+  } catch(error) {
+    console.log('Error on get user by id:', error)
+    return formatResponse(500, 'Error on getting user, please try again.')
+  }
+}
