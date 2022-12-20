@@ -7,6 +7,7 @@ import { parse } from "aws-multipart-parser"
 import { FormData } from '../types/auth/FormData'
 import { allowedImageExtensions } from "../constants/Regexes"
 import { validateEnvVariables } from "../utils/environment"
+import { PaginatedResponse } from "../types/PaginatedResponse"
 
 export const me: Handler = async(event: APIGatewayEvent): Promise<DefaultResponse> => {
   try {
@@ -83,5 +84,47 @@ export const getById: Handler = async(event: any): Promise<DefaultResponse> => {
   } catch(error) {
     console.log('Error on get user by id:', error)
     return formatResponse(500, 'Error on getting user, please try again.')
+  }
+}
+
+export const search: Handler = async(event: any): Promise<DefaultResponse> => {
+  try {
+    const { AVATAR_BUCKET = '', error } = validateEnvVariables(['USER_TABLE', 'AVATAR_BUCKET'])
+    if(error) return formatResponse(500, error)
+
+    const { filter = '' } = event.pathParameters
+    if (!filter) return formatResponse(400, 'Filter not found') 
+
+    const { lastKey }  = event.queryStringParameters || {}
+
+    const query = UserModel.scan()
+      .where("name").contains(filter)
+      .or()
+      .where("email").contains(filter)
+
+    if (lastKey) query.startAt({ cognitoId: lastKey })
+
+    const result = await query.limit(1).exec()
+
+    const response = {} as PaginatedResponse
+
+    if (result) {
+      response.count = result.count
+      response.lastKey = result.lastKey
+
+      for (const document of result) {
+        if (document && document.avatar) {
+          document.avatar = await new S3Service().getImageUrl(AVATAR_BUCKET, document.avatar)
+        }
+      }
+
+      response.data = result
+    }
+
+    return formatResponse(200, undefined, response) 
+
+  } catch(error) {
+    console.log('Error on search user:', error)
+    return formatResponse(500, 'Error on searching user, please try again.')
   }
 }
