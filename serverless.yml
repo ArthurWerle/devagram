@@ -34,16 +34,15 @@ provider:
             - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.userTableName}"
             - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.postTableName}"
   httpApi:
-    authorizers: 
-      serviceAuthorizer: 
+    authorizers:
+      serviceAuthorizer:
         identitySource: $request.header.Authorization
-        issuerUrl: 
+        issuerUrl:
           Fn::Join:
-            - ''
-            -
-              - 'https://cognito-idp.'
-              - '${self:provider.region}'
-              - '.amazonaws.com/'
+            - ""
+            - - "https://cognito-idp."
+              - "${self:provider.region}"
+              - ".amazonaws.com/"
               - Ref: CognitoUserPool
         audience:
           - Ref: CognitoUserPoolClient
@@ -144,6 +143,13 @@ functions:
           path: /user/search/{filter}
           method: get
           authorizer: serviceAuthorizer
+  toggle-follow:
+    handler: src/functions/follow.toggle
+    events:
+      - httpApi:
+          path: /follow/{followId}
+          method: put
+          authorizer: serviceAuthorizer
 
 resources:
   Resources:
@@ -207,19 +213,18 @@ resources:
         Bucket: !Ref AvatarsBucket
         PolicyDocument:
           Statement:
-          - Effect: Allow
-            Principal: "*"
-            Action:
-              - s3:GetObject
-              - s3:PutObject
-              - s3:DeleteObject
-            Resource:
-              Fn::Join:
-                - ""
-                - 
-                  - "arn:aws:s3:::"
-                  - !Ref AvatarsBucket
-                  - "/*"
+            - Effect: Allow
+              Principal: "*"
+              Action:
+                - s3:GetObject
+                - s3:PutObject
+                - s3:DeleteObject
+              Resource:
+                Fn::Join:
+                  - ""
+                  - - "arn:aws:s3:::"
+                    - !Ref AvatarsBucket
+                    - "/*"
     PostsBucket:
       Type: AWS::S3::Bucket
       Properties:
@@ -231,16 +236,15 @@ resources:
         Bucket: !Ref PostsBucket
         PolicyDocument:
           Statement:
-          - Effect: Allow
-            Principal: "*"
-            Action:
-              - s3:GetObject
-              - s3:PutObject
-              - s3:DeleteObject
-            Resource:
-              Fn::Join:
-                - ""
-                - 
-                  - "arn:aws:s3:::"
-                  - !Ref PostsBucket
-                  - "/*"
+            - Effect: Allow
+              Principal: "*"
+              Action:
+                - s3:GetObject
+                - s3:PutObject
+                - s3:DeleteObject
+              Resource:
+                Fn::Join:
+                  - ""
+                  - - "arn:aws:s3:::"
+                    - !Ref PostsBucket
+                    - "/*"
