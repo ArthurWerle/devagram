@@ -104,7 +104,7 @@ export const search: Handler = async(event: any): Promise<DefaultResponse> => {
 
     if (lastKey) query.startAt({ cognitoId: lastKey })
 
-    const result = await query.limit(1).exec()
+    const result = await query.limit(5).exec()
 
     const response = {} as PaginatedResponse
 

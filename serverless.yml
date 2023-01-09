@@ -31,8 +31,7 @@ provider:
           Action:
             - dynamodb:*
           Resource:
-            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.userTableName}"
-            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.postTableName}"
+            - "*"
   httpApi:
     authorizers:
       serviceAuthorizer:
@@ -149,6 +148,20 @@ functions:
       - httpApi:
           path: /follow/{followId}
           method: put
+          authorizer: serviceAuthorizer
+  my-feed:
+    handler: src/functions/feed.byId
+    events:
+      - httpApi:
+          path: /feed/user
+          method: get
+          authorizer: serviceAuthorizer
+  feed-by-id:
+    handler: src/functions/feed.byId
+    events:
+      - httpApi:
+          path: /feed/user/{userId}
+          method: get
           authorizer: serviceAuthorizer
 
 resources:

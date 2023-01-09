@@ -1,10 +1,6 @@
-import type { Handler, APIGatewayEvent } from 'aws-lambda'
-import { allowedImageExtensions, emailRegex, passwordRegex } from '../constants/Regexes'
-import { CognitoServices } from '../services/CognitoService'
+import type { Handler } from 'aws-lambda'
 import { UserModel } from '../models/UserModel'
-import { User } from '../types/models/User'
 import { DefaultResponse, formatResponse } from '../utils/formatResponse'
-import { S3Service } from '../services/S3Services'
 import { validateEnvVariables } from '../utils/environment'
 import { getUserIdFromEvent } from '../utils/authenticationHandler'
 
