@@ -10,6 +10,7 @@ import { parse } from 'aws-multipart-parser'
 import { S3Service } from '../services/S3Services'
 import { ChangePasswordRequest } from '../types/auth/ChangePasswordRequest'
 import { validateEnvVariables } from '../utils/environment'
+import { logger } from '../utils/logger'
 
 export const register: Handler = async(event: APIGatewayEvent): Promise<DefaultResponse> => {
   try {
@@ -45,7 +46,7 @@ export const register: Handler = async(event: APIGatewayEvent): Promise<DefaultR
     return formatResponse(200, 'User created.')
 
   } catch(error) {
-    console.log('Error creating user:', error)
+    logger.error('auth.register: Error creating user:', error)
     return formatResponse(500, 'Error on creating user, please try again.')
   }
 }
@@ -68,7 +69,7 @@ export const confirmEmail: Handler = async(event: APIGatewayEvent): Promise<Defa
     return formatResponse(200, 'User verified.') 
 
   } catch(error) {
-    console.log('Error confirming user:', error)
+    logger.error('auth.confirmEmail: Error confirming user:', error)
     return formatResponse(500, 'Error confirming user, please try again.')
   }
 }
@@ -90,7 +91,7 @@ export const forgotPassword: Handler = async(event: APIGatewayEvent): Promise<De
     return formatResponse(200, 'Forgot password request sent.') 
 
   } catch(error) {
-    console.log('Error on forgot password:', error)
+    logger.error('auth.forgotPassword: Error on forgot password:', error)
     return formatResponse(500, 'Error sending forgot password code, please try again.')
   }
 }
@@ -114,7 +115,7 @@ export const changePassword: Handler = async(event: APIGatewayEvent): Promise<De
     return formatResponse(200, 'Password changed successfully.') 
 
   } catch(error) {
-    console.log('Error on change password:', error)
+    logger.error('auth.changePassword: Error on change password:', error)
     return formatResponse(500, 'Error changing password, please try again.')
   }
 }

@@ -10,6 +10,7 @@ import { validateEnvVariables } from "../utils/environment"
 import * as uuid from 'uuid'
 import * as moment from 'moment'
 import { PostModel } from "../models/PostModel"
+import { logger } from "../utils/logger"
 
 export const create: Handler = async(event: APIGatewayEvent): Promise<DefaultResponse> => {
   try {
@@ -45,7 +46,7 @@ export const create: Handler = async(event: APIGatewayEvent): Promise<DefaultRes
     return formatResponse(200, 'Post sent with success!') 
 
   } catch(error) {
-    console.log('Error on create post:', error)
+    logger.error('post.create: Error on create post:', error)
     return formatResponse(500, 'Error on creating post, please try again.')
   }
 }
@@ -75,7 +76,7 @@ export const toggleLike: Handler = async(event: any): Promise<DefaultResponse> =
     return formatResponse(200, 'Post like/disliked with success!') 
 
   } catch(error) {
-    console.log('Error on toggle like:', error)
+    logger.error('post.toggleLike: Error on toggle like:', error)
     return formatResponse(500, 'Error on like/dislike, please try again.')
   }
 }
@@ -113,7 +114,7 @@ export const postComment: Handler = async(event: any): Promise<DefaultResponse> 
     return formatResponse(200, 'Post commented with success!') 
 
   } catch(error) {
-    console.log('Error on commenting post:', error)
+    logger.error('post.postComment: Error on commenting post:', error)
     return formatResponse(500, 'Error on comment post, please try again.')
   }
 }
@@ -139,7 +140,7 @@ export const get: Handler = async(event: any): Promise<DefaultResponse> =>{
 
     return formatResponse(200, undefined, post)
   } catch (error) {
-    console.log('Error on get post by id: ', error)
+    logger.error('post.get: Error on get post by id: ', error)
     return formatResponse(500, 'Error on retrieving posts, try again later')
   }
 }

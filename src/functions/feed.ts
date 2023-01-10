@@ -7,6 +7,7 @@ import { getUserIdFromEvent } from '../utils/authenticationHandler'
 import { S3Service } from '../services/S3Services'
 import { PaginatedResponse } from '../types/PaginatedResponse'
 import { FeedLastKeyResponse } from '../types/feed/FeedLastKeyResponse'
+import { logger } from '../utils/logger'
 
 export const byId: Handler = async(event: any): Promise<DefaultResponse> => {
   try {
@@ -45,7 +46,7 @@ export const byId: Handler = async(event: any): Promise<DefaultResponse> => {
     return formatResponse(200, undefined, response) 
 
   } catch(error) {
-    console.log('Error on feed by id:', error)
+    logger.error('feed.byId: Error on feed by id:', error)
     return formatResponse(500, 'Error getting feed by id, please try again.')
   }
 }
@@ -88,7 +89,7 @@ export const home: Handler = async(event: any): Promise<DefaultResponse> => {
     return formatResponse(200, undefined, response) 
 
   } catch(error) {
-    console.log('Error on home feed:', error)
+    logger.error('feed.home: Error on home feed:', error)
     return formatResponse(500, 'Error getting home feed, please try again.')
   }
 }

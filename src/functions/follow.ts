@@ -3,6 +3,7 @@ import { UserModel } from '../models/UserModel'
 import { DefaultResponse, formatResponse } from '../utils/formatResponse'
 import { validateEnvVariables } from '../utils/environment'
 import { getUserIdFromEvent } from '../utils/authenticationHandler'
+import { logger } from '../utils/logger'
 
 export const toggle: Handler = async(event: any): Promise<DefaultResponse> => {
   try {
@@ -42,7 +43,7 @@ export const toggle: Handler = async(event: any): Promise<DefaultResponse> => {
       return formatResponse(200, 'User followed')
     }
   } catch(error) {
-    console.log('Error toggle follow user:', error)
+    logger.error('follow.toggle: Error toggle follow user:', error)
     return formatResponse(500, 'Error on toggle follow user, please try again.')
   }
 }

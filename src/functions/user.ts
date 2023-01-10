@@ -8,6 +8,7 @@ import { FormData } from '../types/auth/FormData'
 import { allowedImageExtensions } from "../constants/Regexes"
 import { validateEnvVariables } from "../utils/environment"
 import { PaginatedResponse } from "../types/PaginatedResponse"
+import { logger } from "../utils/logger"
 
 export const me: Handler = async(event: APIGatewayEvent): Promise<DefaultResponse> => {
   try {
@@ -26,7 +27,7 @@ export const me: Handler = async(event: APIGatewayEvent): Promise<DefaultRespons
     return formatResponse(200, undefined, user) 
 
   } catch(error) {
-    console.log('Error on me:', error)
+    logger.error('user.me: Error on me:', error)
     return formatResponse(500, 'Error on getting user, please try again.')
   }
 }
@@ -58,7 +59,7 @@ export const update: Handler = async(event: APIGatewayEvent): Promise<DefaultRes
     return formatResponse(200, 'Success updating user!') 
 
   } catch(error) {
-    console.log('Error on updateUser:', error)
+    logger.error('user.update: Error on updateUser:', error)
     return formatResponse(500, 'Error on updating user data, please try again.')
   }
 }
@@ -82,7 +83,7 @@ export const getById: Handler = async(event: any): Promise<DefaultResponse> => {
     return formatResponse(200, undefined, user) 
 
   } catch(error) {
-    console.log('Error on get user by id:', error)
+    logger.error('user.getById: Error on get user by id:', error)
     return formatResponse(500, 'Error on getting user, please try again.')
   }
 }
@@ -124,7 +125,7 @@ export const search: Handler = async(event: any): Promise<DefaultResponse> => {
     return formatResponse(200, undefined, response) 
 
   } catch(error) {
-    console.log('Error on search user:', error)
+    logger.error('user.search: Error on search user:', error)
     return formatResponse(500, 'Error on searching user, please try again.')
   }
 }
