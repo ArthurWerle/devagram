@@ -2,8 +2,8 @@ service: devagram
 frameworkVersion: "3"
 
 custom:
-  userPoolId: "us-east-1_jT43Gf7TJ"
-  userPoolClientId: "5irfu4hjdrso8rn63f1jp3eamg"
+  userPoolId: !Ref CognitoUserPool
+  userPoolClientId: !Ref CognitoUserPoolClient
   userTableName: "users-table-${self:provider.stage}"
   avatarBucket: "${self:service}-${self:provider.stage}-avatars"
   postTableName: "posts-table-${self:provider.stage}"
