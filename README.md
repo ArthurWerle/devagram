@@ -31,3 +31,7 @@ An instagram infra abstraction created with a serverless architecture.
 ## Logs
 
 - I'm using [Winston](https://github.com/winstonjs/winston/tree/2.x) to manage logs with logs levels. As you can see in `serverless.yml` file, there is a cli param called level (`--param="level={levelName}"`) where you can inform which log level you want, setting an ENV variable. So `info` and `debug` logs will only display if the ENV variable is set to do so, making the logs organized by the log levels you want.
+
+## Deploy
+
+ - I decided to study a little about Github Actions in this repository, so I created some triggers on pushes on `dev` branch.
