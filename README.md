@@ -1,14 +1,13 @@
 # Devagram
 
-A instagram infra abstraction created with a serverless architecture.
+An instagram infra abstraction created with a serverless architecture.
 
-## Technologies used
+## Tech stack
 
-- Serverless framework
-- Node
+- [Serverless framework](https://www.serverless.com/)
+- Node.js
 - Typescript
-- AWS
-- DynamoDB, S3, Lambda
+- AWS (DynamoDB, S3, Lambda, Cognito)
 
 ## Commands
 
