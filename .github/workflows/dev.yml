@@ -27,7 +27,7 @@ jobs:
         with:
           aws-region: us-east-1
           role-to-assume: arn:aws:iam::818315593608:role/githubactions
-          role-session-name: Github actions session
+          role-session-name: githubactions
       - name: serverless deploy
         uses: serverless/github-action@v3.1
         with:
