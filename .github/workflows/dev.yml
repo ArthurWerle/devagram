@@ -26,8 +26,8 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: us-east-1
-          role-to-assume: arn:aws:iam::818315593608:role/githubactions
-          role-session-name: githubactions
+          role-to-assume: arn:aws:iam::818315593608:role/github-actions
+          role-session-name: github-actions
       - name: serverless deploy
         uses: serverless/github-action@v3.1
         with:
