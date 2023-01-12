@@ -5,10 +5,6 @@ on:
     branches:
       - dev
 
-env:
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
-  AWS_SECRET_ACCESS_KEY_ID: ${{ secrets.AWS_SECRET_KEY }}
-
 jobs:
   deploy:
     name: deploy
@@ -27,3 +23,6 @@ jobs:
         uses: serverless/github-action@v3.1
         with:
           args: deploy --stage dev --region us-east-1 --param="level=info"
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY_ID: ${{ secrets.AWS_SECRET_KEY }}
